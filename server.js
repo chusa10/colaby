@@ -18,10 +18,10 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com"],
-      styleSrc:   ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com", "https://cdn.jsdelivr.net"],
+      styleSrc:   ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com", "https://cdn.jsdelivr.net"],
       imgSrc:     ["'self'", "data:", "blob:"],
-      fontSrc:    ["'self'", "data:", "https://cdn.quilljs.com"],
+      fontSrc:    ["'self'", "data:", "https://cdn.quilljs.com", "https://cdn.jsdelivr.net"],
       connectSrc: ["'self'"],
     },
   },
