@@ -14,7 +14,7 @@ const USERS = [
     name:     'Jesus Garcia',              // change to your real name
     email:    'jesus@colaby.app',   // change to your real email
     password: 'changeme123',
-    role:     'analyst',
+    role:     'owner',
   },
   {
     name:     'Anna Baik',

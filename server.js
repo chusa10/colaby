@@ -55,6 +55,10 @@ getDb().then(() => {
       console.log(`  Seeded: ${u.name} <${u.email}>`);
     });
   }
+
+  // Ensure jesus@colaby.app always has owner role (safe to run every boot)
+  const { run: dbRun } = require('./config/db');
+  dbRun("UPDATE users SET role = 'owner' WHERE email = 'jesus@colaby.app' AND role != 'owner'", []);
   // Create SQLite-backed session store
   const store = new SqliteSessionStore();
   store.init();
