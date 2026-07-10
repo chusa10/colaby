@@ -37,6 +37,24 @@ app.use(express.json());
 
 // Boot: initialise DB first, then configure session with persistent store
 getDb().then(() => {
+  // Auto-seed: if no users exist, create default accounts
+  const { get } = require('./config/db');
+  const userCount = get('SELECT COUNT(*) AS count FROM users');
+  if (!userCount || userCount.count === 0) {
+    console.log('No users found — running auto-seed...');
+    const bcrypt = require('bcryptjs');
+    const { run } = require('./config/db');
+    const users = [
+      { name: 'Jesus Garcia', email: 'jesus@colaby.app', password: 'changeme123', role: 'owner' },
+      { name: 'Anna Baik',    email: 'anna@colaby.app',  password: 'changeme111', role: 'analyst' },
+      { name: 'Mitch Atkinson', email: 'mitch@colaby.app', password: 'changeme222', role: 'analyst' },
+    ];
+    users.forEach(u => {
+      const hash = bcrypt.hashSync(u.password, 12);
+      run('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [u.name, u.email, hash, u.role]);
+      console.log(`  Seeded: ${u.name} <${u.email}>`);
+    });
+  }
   // Create SQLite-backed session store
   const store = new SqliteSessionStore();
   store.init();
