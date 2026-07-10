@@ -18,9 +18,8 @@
          value="<%= report ? (report.title || '') : '' %>"
          placeholder="e.g. Sprint 14 Wrap-up" />
 
-  <label for="content">Report Content</label>
-  <textarea id="content" name="content" rows="12"
-            required><%= report ? report.content : '' %></textarea>
+  <label>Report Content</label>
+  <textarea class="rich-editor" name="content"><%= report ? report.content : '' %></textarea>
 
   <div style="margin-top:1.25rem;">
     <button type="submit">Save</button>

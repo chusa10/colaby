@@ -1057,3 +1057,55 @@ a { color: #6366f1; }
   margin: 0;
 }
 .story-edit-form .btn { margin-top: 0; }
+
+/* ─────────────────────────────────────────────
+   Quill rich text editor overrides
+───────────────────────────────────────────── */
+.quill-wrapper {
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+.quill-wrapper .ql-toolbar {
+  border-radius: 7px 7px 0 0;
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+.quill-wrapper .ql-container {
+  border-radius: 0 0 7px 7px;
+  border-color: #d1d5db;
+  min-height: 150px;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.quill-wrapper .ql-editor {
+  min-height: 150px;
+  line-height: 1.7;
+}
+.quill-wrapper .ql-editor.ql-blank::before {
+  color: #9ca3af;
+  font-style: normal;
+}
+
+/* Rich content in detail views */
+.doc-section-body ul, .doc-section-body ol {
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.doc-section-body li { margin-bottom: 0.25rem; }
+.doc-section-body blockquote {
+  border-left: 3px solid #6366f1;
+  padding-left: 1rem;
+  color: #6b7280;
+  margin: 0.75rem 0;
+}
+.doc-section-body pre {
+  background: #1a1a2e;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  margin: 0.75rem 0;
+}
+.doc-section-body strong { font-weight: 700; }
+.doc-section-body em { font-style: italic; }

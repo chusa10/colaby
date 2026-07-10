@@ -13,8 +13,8 @@
   <input type="text" id="title" name="title"
          value="<%= task ? task.title : '' %>" required autofocus />
 
-  <label for="description">Notes / Description</label>
-  <textarea id="description" name="description" rows="5"><%= task ? (task.description||'') : '' %></textarea>
+  <label>Notes / Description</label>
+  <textarea class="rich-editor" name="description"><%= task ? (task.description||'') : '' %></textarea>
 
   <label for="assigned_to">Assigned To</label>
   <select id="assigned_to" name="assigned_to">

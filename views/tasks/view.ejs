@@ -65,7 +65,7 @@ const overdue = !task.completed && task.deadline && task.deadline < today;
   <% if (task.description) { %>
   <div class="doc-section">
     <div class="doc-section-label">Notes</div>
-    <div class="doc-section-body"><%= task.description %></div>
+    <div class="doc-section-body"><%- task.description %></div>
   </div>
   <% } %>
 

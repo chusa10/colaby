@@ -12,14 +12,15 @@ const PORT = process.env.PORT || 3000;
 // Trust proxy (needed when behind Render, Railway, etc.)
 app.set('trust proxy', 1);
 
-// Security headers (relax CSP for inline scripts used in story edit)
+// Security headers (relax CSP for inline scripts and Quill CDN)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", "'unsafe-inline'"],
-      styleSrc:   ["'self'", "'unsafe-inline'"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com"],
+      styleSrc:   ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com"],
       imgSrc:     ["'self'", "data:"],
+      fontSrc:    ["'self'", "data:"],
     },
   },
 }));

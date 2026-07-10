@@ -43,14 +43,14 @@
   <% if (meeting.summary) { %>
   <div class="doc-section">
     <div class="doc-section-label">Summary</div>
-    <div class="doc-section-body"><%= meeting.summary %></div>
+    <div class="doc-section-body"><%- meeting.summary %></div>
   </div>
   <% } %>
 
   <% if (meeting.minutes) { %>
   <div class="doc-section">
     <div class="doc-section-label">Minutes / Notes</div>
-    <div class="doc-section-body"><%= meeting.minutes %></div>
+    <div class="doc-section-body"><%- meeting.minutes %></div>
   </div>
   <% } %>
 

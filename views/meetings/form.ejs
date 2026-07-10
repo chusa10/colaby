@@ -3,18 +3,21 @@
 <div class="page-header">
   <h2><%= meeting ? 'Edit Meeting Minutes' : 'New Meeting Minutes' %></h2>
 </div>
+
+<% if (locals.error) { %><p class="error"><%= error %></p><% } %>
+
 <form method="POST" action="<%= meeting ? '/meetings/' + meeting.id : '/meetings' %>">
   <label for="title">Meeting Title</label>
-  <input type="text" id="title" name="title" value="<%= meeting ? meeting.title : '' %>" required />
+  <input type="text" id="title" name="title" value="<%= meeting ? meeting.title : '' %>" required autofocus />
 
   <label for="date">Date</label>
   <input type="date" id="date" name="date" value="<%= meeting ? meeting.date : '' %>" required />
 
-  <label for="summary">Summary</label>
-  <textarea id="summary" name="summary" rows="3"><%= meeting ? meeting.summary : '' %></textarea>
+  <label>Summary</label>
+  <textarea class="rich-editor" name="summary"><%= meeting ? meeting.summary : '' %></textarea>
 
-  <label for="minutes">Minutes / Notes</label>
-  <textarea id="minutes" name="minutes" rows="8"><%= meeting ? meeting.minutes : '' %></textarea>
+  <label>Minutes / Notes</label>
+  <textarea class="rich-editor" name="minutes"><%= meeting ? meeting.minutes : '' %></textarea>
 
   <div style="margin-top:1.25rem;">
     <button type="submit">Save</button>
