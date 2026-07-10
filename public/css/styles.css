@@ -1109,3 +1109,11 @@ a { color: #6366f1; }
 }
 .doc-section-body strong { font-weight: 700; }
 .doc-section-body em { font-style: italic; }
+
+/* Images in rich text content */
+.doc-section-body img, .ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+}
