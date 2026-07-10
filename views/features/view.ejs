@@ -1,0 +1,110 @@
+<% locals.activePage = 'projects' %>
+<%- include('../layout/header') %>
+
+<div class="doc-view">
+  <div class="doc-view-header">
+    <div class="doc-view-title-row">
+      <div class="doc-view-icon" style="background:#6366f1;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>
+        </svg>
+      </div>
+      <div>
+        <p class="doc-view-eyebrow">Feature — <%= project.title %></p>
+        <h1 class="doc-view-title"><%= feature.name %></h1>
+      </div>
+    </div>
+    <div class="doc-view-actions">
+      <a href="/projects/<%= project.id %>/features/<%= feature.id %>/edit" class="btn">Edit Feature</a>
+      <form method="POST" action="/projects/<%= project.id %>/features/<%= feature.id %>/delete"
+            onsubmit="return confirm('Delete this feature and its stories?')" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="doc-view-meta">
+    <span style="font-size:0.82rem;color:#6b7280;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <%= feature.start_date %> → <%= feature.end_date %>
+    </span>
+    <span class="badge"><%= feature.progress %>% complete</span>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="feature-progress-bar">
+    <div class="feature-progress-fill" style="width:<%= feature.progress %>%;"></div>
+  </div>
+
+  <!-- Add story form -->
+  <div class="story-add-section">
+    <h3>User Stories</h3>
+    <form method="POST" action="/projects/<%= project.id %>/features/<%= feature.id %>/stories" class="story-add-form">
+      <input type="text" name="title" placeholder="Add a user story…" required />
+      <select name="status">
+        <option value="In Progress">In Progress</option>
+        <option value="Testing">Testing</option>
+        <option value="Complete">Complete</option>
+        <option value="Abandoned">Abandoned</option>
+        <option value="Closed">Closed</option>
+      </select>
+      <button type="submit" class="btn">Add</button>
+    </form>
+  </div>
+
+  <!-- Stories list -->
+  <% if (stories.length === 0) { %>
+    <p class="empty-state" style="margin-top:1rem;">No user stories yet. Add one above.</p>
+  <% } else { %>
+    <ul class="story-list">
+      <% stories.forEach(s => { %>
+      <li class="story-item">
+        <div class="story-item-body">
+          <span class="story-title <%= (s.status==='Complete'||s.status==='Closed') ? 'story-title--done' : '' %>" id="story-label-<%= s.id %>"><%= s.title %></span>
+          <!-- Inline edit form (hidden by default) -->
+          <form method="POST" action="/projects/<%= project.id %>/features/<%= feature.id %>/stories/<%= s.id %>/edit"
+                class="story-edit-form" id="story-edit-<%= s.id %>" style="display:none;">
+            <input type="text" name="title" value="<%= s.title %>" required />
+            <button type="submit" class="btn btn-sm">Save</button>
+            <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" style="background:#9ca3af;">Cancel</button>
+          </form>
+        </div>
+        <div class="story-item-actions">
+          <!-- Edit button -->
+          <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" title="Edit story" style="background:#f59e0b;">✎</button>
+          <form method="POST" action="/projects/<%= project.id %>/features/<%= feature.id %>/stories/<%= s.id %>/status" class="story-status-form">
+            <select name="status" onchange="this.form.submit()">
+              <% ['In Progress','Testing','Complete','Abandoned','Closed'].forEach(st => { %>
+                <option value="<%= st %>" <%= s.status === st ? 'selected' : '' %>><%= st %></option>
+              <% }) %>
+            </select>
+          </form>
+          <form method="POST" action="/projects/<%= project.id %>/features/<%= feature.id %>/stories/<%= s.id %>/delete"
+                onsubmit="return confirm('Delete this story?')" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">✕</button>
+          </form>
+        </div>
+      </li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <a href="/projects/<%= project.id %>" class="doc-back-link">&larr; Back to Project Timeline</a>
+</div>
+
+<script>
+function toggleStoryEdit(id) {
+  const label = document.getElementById('story-label-' + id);
+  const form  = document.getElementById('story-edit-' + id);
+  if (form.style.display === 'none') {
+    form.style.display = 'flex';
+    label.style.display = 'none';
+    form.querySelector('input').focus();
+  } else {
+    form.style.display = 'none';
+    label.style.display = '';
+  }
+}
+</script>
+
+<%- include('../layout/footer') %>

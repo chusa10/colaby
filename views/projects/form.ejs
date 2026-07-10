@@ -1,0 +1,32 @@
+<% locals.activePage = 'projects' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2><%= project ? 'Edit Project' : 'New Project' %></h2>
+</div>
+
+<% if (locals.error) { %><p class="error"><%= error %></p><% } %>
+
+<form method="POST" action="<%= project ? '/projects/' + project.id : '/projects' %>">
+
+  <label for="title">Title</label>
+  <input type="text" id="title" name="title"
+         value="<%= project ? project.title : '' %>" required autofocus />
+
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="4"><%= project ? (project.description||'') : '' %></textarea>
+
+  <label for="status">Status</label>
+  <select id="status" name="status">
+    <% ['Not Started','In Progress','Completed','On Hold'].forEach(s => { %>
+      <option value="<%= s %>" <%= project && project.status === s ? 'selected' : '' %>><%= s %></option>
+    <% }) %>
+  </select>
+
+  <div style="margin-top:1.5rem;">
+    <button type="submit">Save</button>
+    <a href="/projects">Cancel</a>
+  </div>
+</form>
+
+<%- include('../layout/footer') %>

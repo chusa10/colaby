@@ -1,0 +1,67 @@
+<% locals.activePage = 'meetings' %>
+<%- include('../layout/header') %>
+
+<div class="doc-view">
+
+  <!-- ── Header ── -->
+  <div class="doc-view-header">
+    <div class="doc-view-title-row">
+      <div class="doc-view-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <p class="doc-view-eyebrow">Meeting Minutes</p>
+        <h1 class="doc-view-title"><%= meeting.title %></h1>
+      </div>
+    </div>
+    <div class="doc-view-actions">
+      <a href="/meetings/<%= meeting.id %>/edit" class="btn">Edit</a>
+      <form method="POST" action="/meetings/<%= meeting.id %>/delete"
+            onsubmit="return confirm('Delete this meeting entry?')" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="doc-view-meta">
+    <span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <%= meeting.date %>
+    </span>
+    <span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <%- include('../layout/author-badge', { author: meeting.author }) %>
+    </span>
+  </div>
+
+  <!-- ── Sections ── -->
+  <% if (meeting.summary) { %>
+  <div class="doc-section">
+    <div class="doc-section-label">Summary</div>
+    <div class="doc-section-body"><%= meeting.summary %></div>
+  </div>
+  <% } %>
+
+  <% if (meeting.minutes) { %>
+  <div class="doc-section">
+    <div class="doc-section-label">Minutes / Notes</div>
+    <div class="doc-section-body"><%= meeting.minutes %></div>
+  </div>
+  <% } %>
+
+  <% if (!meeting.summary && !meeting.minutes) { %>
+  <div class="doc-section">
+    <div class="doc-section-body" style="color:#9ca3af;">No content recorded for this meeting.</div>
+  </div>
+  <% } %>
+
+  <a href="/meetings" class="doc-back-link">&larr; Back to Meetings</a>
+
+</div>
+
+<%- include('../layout/footer') %>

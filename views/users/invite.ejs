@@ -1,0 +1,35 @@
+<% locals.activePage = 'users' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2>Invite Team Member</h2>
+</div>
+
+<% if (locals.error) { %><p class="error"><%= error %></p><% } %>
+
+<form method="POST" action="/users/invite">
+  <label for="name">Full Name</label>
+  <input type="text" id="name" name="name" required autofocus />
+
+  <label for="email">Email Address</label>
+  <input type="email" id="email" name="email" required />
+
+  <label for="role">Role</label>
+  <select id="role" name="role">
+    <option value="analyst">Business Analyst</option>
+    <option value="supervisor">Supervisor</option>
+    <option value="owner">Admin</option>
+  </select>
+
+  <label for="password">Temporary Password</label>
+  <input type="text" id="password" name="password" required
+         placeholder="Share this with the new member" />
+  <p class="field-hint">The member can update their password after signing in.</p>
+
+  <div style="margin-top:1.25rem;">
+    <button type="submit">Send Invite</button>
+    <a href="/users">Cancel</a>
+  </div>
+</form>
+
+<%- include('../layout/footer') %>

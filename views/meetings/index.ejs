@@ -1,0 +1,53 @@
+<% locals.activePage = 'meetings' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2>Meeting Minutes</h2>
+  <a href="/meetings/new" class="btn">+ New Entry</a>
+</div>
+
+<% if (meetings.length === 0 && page === 1) { %>
+  <div class="empty-state-box">
+    <p>No meeting minutes recorded yet.</p>
+    <a href="/meetings/new" class="btn" style="margin-top:1rem;">Record your first meeting</a>
+  </div>
+<% } else { %>
+
+  <div class="card-grid">
+    <% meetings.forEach(m => { %>
+      <a href="/meetings/<%= m.id %>" class="meeting-card">
+        <div class="meeting-card-header">
+          <span class="meeting-card-title"><%= m.title %></span>
+          <span class="meeting-card-date"><%= m.date %></span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.35rem;">
+          <p class="meeting-card-preview"><%= m.summary ? m.summary : 'No summary provided.' %></p>
+          <span style="margin-left:0.75rem; flex-shrink:0;"><%- include('../layout/author-badge', { author: m.author }) %></span>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+
+  <!-- Pagination — always visible when there are entries -->
+  <div class="pagination">
+    <% if (page > 1) { %>
+      <a href="/meetings?page=<%= page - 1 %>" class="pag-btn" title="Previous page">&#8249;</a>
+    <% } else { %>
+      <span class="pag-btn pag-btn--disabled">&#8249;</span>
+    <% } %>
+
+    <span class="pag-info">
+      Page <%= page %> of <%= totalPages || 1 %>
+      <span class="pag-total">(<%= total %> total)</span>
+    </span>
+
+    <% if (page < totalPages) { %>
+      <a href="/meetings?page=<%= page + 1 %>" class="pag-btn" title="Next page">&#8250;</a>
+    <% } else { %>
+      <span class="pag-btn pag-btn--disabled">&#8250;</span>
+    <% } %>
+  </div>
+
+<% } %>
+
+<%- include('../layout/footer') %>

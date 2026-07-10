@@ -1,0 +1,31 @@
+<% locals.activePage = 'reports' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2><%= report ? 'Edit Report' : 'New Weekly Report' %></h2>
+</div>
+
+<% if (locals.error) { %><p class="error"><%= error %></p><% } %>
+
+<form method="POST" action="<%= report ? '/reports/' + report.id : '/reports' %>">
+
+  <label for="week_of">Week Of</label>
+  <input type="date" id="week_of" name="week_of"
+         value="<%= report ? report.week_of : '' %>" required autofocus />
+
+  <label for="title">Title <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+  <input type="text" id="title" name="title"
+         value="<%= report ? (report.title || '') : '' %>"
+         placeholder="e.g. Sprint 14 Wrap-up" />
+
+  <label for="content">Report Content</label>
+  <textarea id="content" name="content" rows="12"
+            required><%= report ? report.content : '' %></textarea>
+
+  <div style="margin-top:1.25rem;">
+    <button type="submit">Save</button>
+    <a href="/reports">Cancel</a>
+  </div>
+</form>
+
+<%- include('../layout/footer') %>

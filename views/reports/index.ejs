@@ -1,0 +1,54 @@
+<% locals.activePage = 'reports' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2>Weekly Reports</h2>
+  <a href="/reports/new" class="btn">+ New Report</a>
+</div>
+
+<% if (reports.length === 0 && page === 1) { %>
+  <div class="empty-state-box">
+    <p>No weekly reports submitted yet.</p>
+    <a href="/reports/new" class="btn" style="margin-top:1rem;">Submit your first report</a>
+  </div>
+<% } else { %>
+
+  <div class="card-grid">
+    <% reports.forEach(r => { %>
+      <a href="/reports/<%= r.id %>" class="meeting-card">
+        <div class="meeting-card-header">
+          <span class="meeting-card-title">
+            <%= r.title ? r.title : 'Week of ' + r.week_of %>
+          </span>
+          <span class="meeting-card-date"><%= r.week_of %></span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.35rem;">
+          <p class="meeting-card-preview"><%= r.content %></p>
+          <span style="margin-left:0.75rem; flex-shrink:0;"><%- include('../layout/author-badge', { author: r.author }) %></span>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+
+  <div class="pagination">
+    <% if (page > 1) { %>
+      <a href="/reports?page=<%= page - 1 %>" class="pag-btn" title="Previous page">&#8249;</a>
+    <% } else { %>
+      <span class="pag-btn pag-btn--disabled">&#8249;</span>
+    <% } %>
+
+    <span class="pag-info">
+      Page <%= page %> of <%= totalPages || 1 %>
+      <span class="pag-total">(<%= total %> total)</span>
+    </span>
+
+    <% if (page < totalPages) { %>
+      <a href="/reports?page=<%= page + 1 %>" class="pag-btn" title="Next page">&#8250;</a>
+    <% } else { %>
+      <span class="pag-btn pag-btn--disabled">&#8250;</span>
+    <% } %>
+  </div>
+
+<% } %>
+
+<%- include('../layout/footer') %>

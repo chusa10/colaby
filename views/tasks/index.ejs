@@ -1,0 +1,95 @@
+<% locals.activePage = 'tasks' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2>Tasks</h2>
+  <a href="/tasks/new" class="btn">+ New Task</a>
+</div>
+
+<!-- Filter tabs -->
+<div class="filter-tabs">
+  <a href="/tasks?filter=open"      class="filter-tab <%= filter === 'open'      ? 'active' : '' %>">Open</a>
+  <a href="/tasks?filter=completed" class="filter-tab <%= filter === 'completed' ? 'active' : '' %>">Completed</a>
+  <a href="/tasks?filter=all"       class="filter-tab <%= filter === 'all'       ? 'active' : '' %>">All</a>
+</div>
+
+<% if (tasks.length === 0) { %>
+  <div class="empty-state-box" style="margin-top:1rem;">
+    <p><%= filter === 'completed' ? 'No completed tasks yet.' : 'No open tasks. Great job!' %></p>
+    <% if (filter !== 'completed') { %>
+      <a href="/tasks/new" class="btn" style="margin-top:1rem;">Create a task</a>
+    <% } %>
+  </div>
+<% } else { %>
+
+  <ul class="task-list">
+    <% tasks.forEach(t => {
+      const today     = new Date().toISOString().slice(0,10);
+      const overdue   = !t.completed && t.deadline && t.deadline < today;
+      const dueSoon   = !t.completed && t.deadline && t.deadline === today;
+    %>
+    <li class="task-item <%= t.completed ? 'task-done' : '' %> <%= overdue ? 'task-overdue' : '' %>">
+
+      <!-- Checkbox toggle -->
+      <form method="POST" action="/tasks/<%= t.id %>/toggle" class="task-check-form">
+        <button type="submit" class="task-check <%= t.completed ? 'task-check--done' : '' %>" title="<%= t.completed ? 'Reopen' : 'Mark complete' %>">
+          <% if (t.completed) { %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <% } %>
+        </button>
+      </form>
+
+      <!-- Task body -->
+      <div class="task-body">
+        <a href="/tasks/<%= t.id %>" class="task-title <%= t.completed ? 'task-title--done' : '' %>"><%= t.title %></a>
+        <% if (t.description) { %>
+          <p class="task-desc"><%= t.description.length > 100 ? t.description.slice(0,100) + '…' : t.description %></p>
+        <% } %>
+        <div class="task-meta">
+          <% if (t.deadline) { %>
+            <span class="task-deadline <%= overdue ? 'task-deadline--overdue' : dueSoon ? 'task-deadline--today' : '' %>">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <%= overdue ? 'Overdue · ' : dueSoon ? 'Due today · ' : '' %><%= t.deadline %>
+            </span>
+          <% } %>
+          <% if (t.assigned_by_name) { %>
+            <span class="task-meta-label">From</span>
+            <%- include('../layout/author-badge', { author: t.assigned_by_name }) %>
+          <% } %>
+          <% if (t.assigned_to_name) { %>
+            <span class="task-meta-label">To</span>
+            <%- include('../layout/author-badge', { author: t.assigned_to_name }) %>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Status badge + delete -->
+      <div style="display:flex; align-items:center; gap:0.5rem; flex-shrink:0;">
+        <span class="badge badge-<%= t.status.toLowerCase().replace(/ /g,'-') %>"><%= t.status %></span>
+        <form method="POST" action="/tasks/<%= t.id %>/delete"
+              onsubmit="return confirm('Delete this task?')" style="display:inline;margin:0;padding:0;background:none;box-shadow:none;">
+          <button type="submit" class="btn btn-danger btn-sm" title="Delete">✕</button>
+        </form>
+      </div>
+
+    </li>
+    <% }) %>
+  </ul>
+
+  <div class="pagination">
+    <% if (page > 1) { %>
+      <a href="/tasks?filter=<%= filter %>&page=<%= page-1 %>" class="pag-btn">&#8249;</a>
+    <% } else { %>
+      <span class="pag-btn pag-btn--disabled">&#8249;</span>
+    <% } %>
+    <span class="pag-info">Page <%= page %> of <%= totalPages||1 %> <span class="pag-total">(<%= total %> total)</span></span>
+    <% if (page < totalPages) { %>
+      <a href="/tasks?filter=<%= filter %>&page=<%= page+1 %>" class="pag-btn">&#8250;</a>
+    <% } else { %>
+      <span class="pag-btn pag-btn--disabled">&#8250;</span>
+    <% } %>
+  </div>
+
+<% } %>
+
+<%- include('../layout/footer') %>

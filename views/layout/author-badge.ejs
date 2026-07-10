@@ -1,0 +1,6 @@
+<%
+// Derive a CSS class from the author's first name (lowercase, letters only).
+// Falls back to 'badge-author-default' for unknown users.
+const _firstName = (author || '').trim().split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+const _cls = _firstName ? 'badge-author-' + _firstName : 'badge-author-default';
+%><span class="badge badge-author <%= _cls %>"><%= author || 'Unknown' %></span>

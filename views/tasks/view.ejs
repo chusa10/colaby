@@ -1,0 +1,75 @@
+<% locals.activePage = 'tasks' %>
+<%- include('../layout/header') %>
+
+<%
+const today   = new Date().toISOString().slice(0,10);
+const overdue = !task.completed && task.deadline && task.deadline < today;
+%>
+
+<div class="doc-view">
+  <div class="doc-view-header">
+    <div class="doc-view-title-row">
+      <div class="doc-view-icon" style="<%= task.completed ? 'background:#10b981;' : overdue ? 'background:#ef4444;' : '' %>">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 11 12 14 22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <div>
+        <p class="doc-view-eyebrow">Task</p>
+        <h1 class="doc-view-title <%= task.completed ? 'task-title--done' : '' %>"><%= task.title %></h1>
+      </div>
+    </div>
+    <div class="doc-view-actions">
+      <!-- Toggle complete -->
+      <form method="POST" action="/tasks/<%= task.id %>/toggle" style="display:inline;">
+        <button type="submit" class="btn <%= task.completed ? '' : 'btn-success' %>">
+          <%= task.completed ? 'Reopen' : '✓ Mark Complete' %>
+        </button>
+      </form>
+      <a href="/tasks/<%= task.id %>/edit" class="btn">Edit</a>
+      <form method="POST" action="/tasks/<%= task.id %>/delete"
+            onsubmit="return confirm('Delete this task?')" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Meta row -->
+  <div class="doc-view-meta">
+    <span class="badge badge-<%= task.status.toLowerCase().replace(/ /g,'-') %>"><%= task.status %></span>
+
+    <% if (task.deadline) { %>
+      <span class="task-deadline <%= overdue ? 'task-deadline--overdue' : task.deadline === today ? 'task-deadline--today' : '' %>">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <%= overdue ? 'Overdue · ' : task.deadline === today ? 'Due today · ' : 'Due ' %><%= task.deadline %>
+      </span>
+    <% } %>
+
+    <% if (task.assigned_by_name) { %>
+      <span class="task-meta-label">Assigned by</span>
+      <%- include('../layout/author-badge', { author: task.assigned_by_name }) %>
+    <% } %>
+
+    <% if (task.assigned_to_name) { %>
+      <span class="task-meta-label">Assigned to</span>
+      <%- include('../layout/author-badge', { author: task.assigned_to_name }) %>
+    <% } %>
+
+    <% if (task.completed && task.completed_at) { %>
+      <span style="color:#10b981;font-size:0.78rem;">✓ Completed <%= task.completed_at.slice(0,10) %></span>
+    <% } %>
+  </div>
+
+  <!-- Notes -->
+  <% if (task.description) { %>
+  <div class="doc-section">
+    <div class="doc-section-label">Notes</div>
+    <div class="doc-section-body"><%= task.description %></div>
+  </div>
+  <% } %>
+
+  <a href="/tasks" class="doc-back-link">&larr; Back to Tasks</a>
+</div>
+
+<%- include('../layout/footer') %>

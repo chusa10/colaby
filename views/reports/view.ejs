@@ -1,0 +1,52 @@
+<% locals.activePage = 'reports' %>
+<%- include('../layout/header') %>
+
+<div class="doc-view">
+
+  <!-- ── Header ── -->
+  <div class="doc-view-header">
+    <div class="doc-view-title-row">
+      <div class="doc-view-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18M9 21V9"/>
+        </svg>
+      </div>
+      <div>
+        <p class="doc-view-eyebrow">Weekly Report</p>
+        <h1 class="doc-view-title">
+          <%= report.title ? report.title : 'Week of ' + report.week_of %>
+        </h1>
+      </div>
+    </div>
+    <div class="doc-view-actions">
+      <a href="/reports/<%= report.id %>/edit" class="btn">Edit</a>
+      <form method="POST" action="/reports/<%= report.id %>/delete"
+            onsubmit="return confirm('Delete this report?')" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="doc-view-meta">
+    <span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <%= report.week_of %>
+    </span>
+    <span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <%- include('../layout/author-badge', { author: report.author }) %>
+    </span>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="doc-section">
+    <div class="doc-section-label">Report Content</div>
+    <div class="doc-section-body"><%= report.content %></div>
+  </div>
+
+  <a href="/reports" class="doc-back-link">&larr; Back to Reports</a>
+
+</div>
+
+<%- include('../layout/footer') %>

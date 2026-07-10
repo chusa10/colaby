@@ -1,0 +1,136 @@
+<% locals.activePage = 'projects' %>
+<%- include('../layout/header') %>
+
+<%
+// Calculate timeline range from features
+let minDate = null, maxDate = null;
+features.forEach(f => {
+  if (f.start_date && (!minDate || f.start_date < minDate)) minDate = f.start_date;
+  if (f.end_date   && (!maxDate || f.end_date   > maxDate)) maxDate = f.end_date;
+});
+// Default to current month + 3 months if no features
+if (!minDate) minDate = new Date().toISOString().slice(0,10);
+if (!maxDate) {
+  const d = new Date(); d.setMonth(d.getMonth() + 3);
+  maxDate = d.toISOString().slice(0,10);
+}
+
+// Helper: parse 'YYYY-MM-DD' into a day-count since epoch (no timezone issues)
+function toDays(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d) / (1000 * 60 * 60 * 24));
+}
+
+// Build array of months between minDate and maxDate
+const startYear  = parseInt(minDate.slice(0,4));
+const startMon   = parseInt(minDate.slice(5,7)) - 1;
+const endYear    = parseInt(maxDate.slice(0,4));
+const endMon     = parseInt(maxDate.slice(5,7)) - 1;
+const months     = [];
+let my = startYear, mm = startMon;
+while (my < endYear || (my === endYear && mm <= endMon)) {
+  const label = new Date(my, mm, 1).toLocaleString('en', { month: 'short', year: 'numeric' });
+  months.push({ year: my, month: mm, label });
+  mm++;
+  if (mm > 11) { mm = 0; my++; }
+}
+
+// Range in days — from first day of first month to first day of month AFTER last month
+const rangeStartDays = toDays(startYear + '-' + String(startMon+1).padStart(2,'0') + '-01');
+const afterEndMon    = endMon + 1 > 11 ? 0 : endMon + 1;
+const afterEndYear   = endMon + 1 > 11 ? endYear + 1 : endYear;
+const rangeEndDays   = toDays(afterEndYear + '-' + String(afterEndMon+1).padStart(2,'0') + '-01');
+const totalDays      = rangeEndDays - rangeStartDays;
+const totalPx        = months.length * 500;
+%>
+
+<div class="doc-view">
+
+  <div class="doc-view-header">
+    <div class="doc-view-title-row">
+      <div class="doc-view-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        </svg>
+      </div>
+      <div>
+        <p class="doc-view-eyebrow">Project</p>
+        <h1 class="doc-view-title"><%= project.title %></h1>
+      </div>
+    </div>
+    <div class="doc-view-actions">
+      <a href="/projects/<%= project.id %>/features/new" class="btn">+ Add Feature</a>
+      <a href="/projects/<%= project.id %>/edit" class="btn">Edit</a>
+      <form method="POST" action="/projects/<%= project.id %>/delete"
+            onsubmit="return confirm('Delete this project and all its features?')" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="doc-view-meta">
+    <span class="badge badge-<%= project.status.toLowerCase().replace(/ /g,'-') %>"><%= project.status %></span>
+    <% if (project.description) { %>
+      <span style="color:#6b7280;font-size:0.82rem;"><%= project.description %></span>
+    <% } %>
+  </div>
+
+  <!-- ── Gantt Chart ── -->
+  <% if (features.length === 0) { %>
+    <div class="empty-state-box" style="margin-top:1rem;">
+      <p>No features added yet. Add your first feature to see the timeline.</p>
+      <a href="/projects/<%= project.id %>/features/new" class="btn" style="margin-top:1rem;">+ Add Feature</a>
+    </div>
+  <% } else { %>
+
+  <div class="gantt-container">
+    <div class="gantt-scroll">
+
+      <!-- Month headers -->
+      <div class="gantt-header" style="width:<%= totalPx %>px;">
+        <% months.forEach(m => { %>
+          <div class="gantt-month" style="width:500px;"><%= m.label %></div>
+        <% }) %>
+      </div>
+
+      <!-- Feature bars -->
+      <div class="gantt-body" style="width:<%= totalPx %>px; position:relative;">
+        <!-- Grid lines -->
+        <% months.forEach((m, i) => { %>
+          <div class="gantt-grid-line" style="left:<%= i * 500 %>px;"></div>
+        <% }) %>
+
+        <% features.forEach(f => {
+          // Calculate bar position using day counts (no timezone issues)
+          const fStartDays = Math.max(toDays(f.start_date), rangeStartDays);
+          const fEndDays   = Math.min(toDays(f.end_date), rangeEndDays);
+          const leftPx  = ((fStartDays - rangeStartDays) / totalDays) * totalPx;
+          const widthPx = ((fEndDays - fStartDays) / totalDays) * totalPx;
+        %>
+        <div class="gantt-row">
+          <a href="/projects/<%= project.id %>/features/<%= f.id %>" class="gantt-bar" style="left:<%= leftPx %>px; width:<%= Math.max(widthPx, 60) %>px;" title="<%= f.name %> (<%= f.progress %>%)">
+            <div class="gantt-bar-fill" style="width:<%= f.progress %>%;"></div>
+            <span class="gantt-bar-label"><%= f.name %></span>
+          </a>
+        </div>
+        <% }) %>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="gantt-legend">
+    <span><span class="gantt-legend-filled"></span> Completed</span>
+    <span><span class="gantt-legend-remaining"></span> Remaining</span>
+    <span style="color:#9ca3af;font-size:0.75rem;">Click a bar to view user stories</span>
+  </div>
+
+  <% } %>
+
+  <a href="/projects" class="doc-back-link">&larr; Back to Projects</a>
+
+</div>
+
+<%- include('../layout/footer') %>

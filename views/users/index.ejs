@@ -1,0 +1,45 @@
+<% locals.activePage = 'users' %>
+<%- include('../layout/header') %>
+
+<div class="page-header">
+  <h2>Team Members</h2>
+  <a href="/users/invite" class="btn">+ Invite Member</a>
+</div>
+
+<% if (locals.error) { %><p class="error"><%= error %></p><% } %>
+<% if (query && query.invited) { %><p class="success">Member invited successfully.</p><% } %>
+<% if (query && query.deleted) { %><p class="success">Member removed.</p><% } %>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Joined</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% users.forEach(u => { %>
+    <tr>
+      <td><%= u.name %></td>
+      <td><%= u.email %></td>
+      <td><span class="badge badge-role-<%= u.role %>"><%= u.role === 'owner' ? 'Admin' : u.role %></span></td>
+      <td class="date"><%= u.created_at ? u.created_at.slice(0,10) : '—' %></td>
+      <td>
+        <% if (u.id !== currentUser.id) { %>
+        <form method="POST" action="/users/<%= u.id %>/delete"
+              onsubmit="return confirm('Remove <%= u.name %> from the team?')">
+          <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+        </form>
+        <% } else { %>
+        <span class="muted">you</span>
+        <% } %>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<%- include('../layout/footer') %>
