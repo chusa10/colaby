@@ -14,13 +14,15 @@ app.set('trust proxy', 1);
 
 // Security headers (relax CSP for inline scripts and Quill CDN)
 app.use(helmet({
+  crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc:  ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com"],
       styleSrc:   ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com"],
-      imgSrc:     ["'self'", "data:"],
-      fontSrc:    ["'self'", "data:"],
+      imgSrc:     ["'self'", "data:", "blob:"],
+      fontSrc:    ["'self'", "data:", "https://cdn.quilljs.com"],
+      connectSrc: ["'self'"],
     },
   },
 }));
