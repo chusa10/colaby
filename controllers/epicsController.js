@@ -43,7 +43,7 @@ exports.view = (req, res) => {
       [f.id]
     );
     if (f.stories.length > 0) {
-      const done = f.stories.filter(s => s.status === 'Complete' || s.status === 'Closed').length;
+      const done = f.stories.filter(s => s.status === 'Resolved' || s.status === 'Closed').length;
       f.progress = Math.round((done / f.stories.length) * 100);
     }
   });

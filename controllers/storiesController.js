@@ -1,6 +1,6 @@
 const { all, get, run } = require('../config/db');
 
-const STATUSES = ['In Progress', 'Complete', 'Testing', 'Abandoned', 'Closed'];
+const STATUSES = ['New', 'Active', 'Resolved', 'Closed', 'Removed', 'Inactive'];
 
 // POST /projects/:projectId/epics/:epicId/features/:featureId/stories
 exports.create = (req, res) => {
@@ -11,7 +11,7 @@ exports.create = (req, res) => {
 
   run(
     `INSERT INTO user_stories (feature_id, title, status) VALUES (?, ?, ?)`,
-    [featureId, title.trim(), STATUSES.includes(status) ? status : 'In Progress']
+    [featureId, title.trim(), STATUSES.includes(status) ? status : 'New']
   );
   res.redirect(`/projects/${projectId}/epics/${epicId}/features/${featureId}`);
 };

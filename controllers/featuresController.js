@@ -41,7 +41,7 @@ exports.view = (req, res) => {
   // Calculate progress
   let progress = 0;
   if (stories.length > 0) {
-    const done = stories.filter(s => s.status === 'Complete' || s.status === 'Closed').length;
+    const done = stories.filter(s => s.status === 'Resolved' || s.status === 'Closed').length;
     progress = Math.round((done / stories.length) * 100);
   }
   feature.progress = progress;

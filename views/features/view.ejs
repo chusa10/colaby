@@ -44,11 +44,12 @@
     <form method="POST" action="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= feature.id %>/stories" class="story-add-form">
       <input type="text" name="title" placeholder="Add a user story…" required />
       <select name="status">
-        <option value="In Progress">In Progress</option>
-        <option value="Testing">Testing</option>
-        <option value="Complete">Complete</option>
-        <option value="Abandoned">Abandoned</option>
+        <option value="New">New</option>
+        <option value="Active">Active</option>
+        <option value="Resolved">Resolved</option>
         <option value="Closed">Closed</option>
+        <option value="Removed">Removed</option>
+        <option value="Inactive">Inactive</option>
       </select>
       <button type="submit" class="btn">Add</button>
     </form>
@@ -62,7 +63,7 @@
       <% stories.forEach(s => { %>
       <li class="story-item">
         <div class="story-item-body">
-          <span class="story-title <%= (s.status==='Complete'||s.status==='Closed') ? 'story-title--done' : '' %>" id="story-label-<%= s.id %>"><%= s.title %></span>
+          <span class="story-title <%= (s.status==='Resolved'||s.status==='Closed') ? 'story-title--done' : '' %>" id="story-label-<%= s.id %>"><%= s.title %></span>
           <!-- Inline edit form (hidden by default) -->
           <form method="POST" action="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= feature.id %>/stories/<%= s.id %>/edit"
                 class="story-edit-form" id="story-edit-<%= s.id %>" style="display:none;">
@@ -76,7 +77,7 @@
           <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" title="Edit story" style="background:#f59e0b;">✎</button>
           <form method="POST" action="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= feature.id %>/stories/<%= s.id %>/status" class="story-status-form">
             <select name="status" onchange="this.form.submit()">
-              <% ['In Progress','Testing','Complete','Abandoned','Closed'].forEach(st => { %>
+              <% ['New','Active','Resolved','Closed','Removed','Inactive'].forEach(st => { %>
                 <option value="<%= st %>" <%= s.status === st ? 'selected' : '' %>><%= st %></option>
               <% }) %>
             </select>

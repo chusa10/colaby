@@ -45,7 +45,7 @@ exports.view = (req, res) => {
     features.forEach(f => {
       const stories = all('SELECT status FROM user_stories WHERE feature_id = ?', [f.id]);
       totalStories += stories.length;
-      doneStories += stories.filter(s => s.status === 'Complete' || s.status === 'Closed').length;
+      doneStories += stories.filter(s => s.status === 'Resolved' || s.status === 'Closed').length;
     });
     e.progress = totalStories > 0 ? Math.round((doneStories / totalStories) * 100) : 0;
     e.feature_count = features.length;

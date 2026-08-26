@@ -1166,3 +1166,13 @@ a { color: #6366f1; }
   transition: width 0.3s;
 }
 .feature-item-pct { font-size: 0.72rem; color: #6b7280; font-weight: 600; min-width: 30px; text-align: right; }
+
+/* ─────────────────────────────────────────────
+   Status badges (Epic/Feature/Story statuses)
+───────────────────────────────────────────── */
+.badge-new       { background: #e0e7ff; color: #3730a3; }
+.badge-active    { background: #dbeafe; color: #1d4ed8; }
+.badge-resolved  { background: #d1fae5; color: #065f46; }
+.badge-closed    { background: #f3f4f6; color: #374151; }
+.badge-removed   { background: #fee2e2; color: #991b1b; }
+.badge-inactive  { background: #fef3c7; color: #92400e; }
