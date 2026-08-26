@@ -24,7 +24,7 @@
         </div>
         <span class="project-card-title"><%= p.title %></span>
         <span class="badge badge-<%= p.status.toLowerCase().replace(/ /g,'-') %>"><%= p.status %></span>
-        <span class="project-card-features"><%= p.feature_count %> feature<%= p.feature_count !== 1 ? 's' : '' %></span>
+        <span class="project-card-features"><%= p.epic_count %> epic<%= p.epic_count !== 1 ? 's' : '' %></span>
       </a>
     <% }) %>
   </div>

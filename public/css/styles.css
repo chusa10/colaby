@@ -1117,3 +1117,52 @@ a { color: #6366f1; }
   border-radius: 6px;
   margin: 0.5rem 0;
 }
+
+/* ─────────────────────────────────────────────
+   Feature list (inside epic detail view)
+───────────────────────────────────────────── */
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  transition: box-shadow 0.15s;
+}
+.feature-item:hover { box-shadow: 0 3px 10px rgba(0,0,0,.09); }
+.feature-item-body {
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.feature-item-name { font-weight: 600; font-size: 0.92rem; color: #1a1a2e; }
+.feature-item-body:hover .feature-item-name { text-decoration: underline; }
+.feature-item-meta { font-size: 0.75rem; color: #9ca3af; }
+.feature-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.feature-mini-progress {
+  width: 60px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.feature-mini-progress-fill {
+  height: 100%;
+  background: #6366f1;
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+.feature-item-pct { font-size: 0.72rem; color: #6b7280; font-weight: 600; min-width: 30px; text-align: right; }

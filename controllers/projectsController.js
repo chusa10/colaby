@@ -3,7 +3,7 @@ const { all, get, run } = require('../config/db');
 // GET /projects
 exports.index = (req, res) => {
   const projects = all(
-    `SELECT p.*, (SELECT COUNT(*) FROM features WHERE project_id = p.id) AS feature_count
+    `SELECT p.*, (SELECT COUNT(*) FROM epics WHERE project_id = p.id) AS epic_count
      FROM projects p
      ORDER BY p.created_at DESC`
   );
@@ -28,30 +28,30 @@ exports.create = (req, res) => {
   res.redirect(`/projects/${lastInsertRowid}`);
 };
 
-// GET /projects/:id — Gantt chart view
+// GET /projects/:id — Gantt chart view showing Epics
 exports.view = (req, res) => {
   const project = get('SELECT * FROM projects WHERE id = ?', [req.params.id]);
   if (!project) return res.status(404).send('Project not found.');
 
-  const features = all(
-    `SELECT * FROM features WHERE project_id = ? ORDER BY start_date ASC, created_at ASC`,
+  const epics = all(
+    `SELECT * FROM epics WHERE project_id = ? ORDER BY start_date ASC, created_at ASC`,
     [project.id]
   );
 
-  // Get stories count per feature
-  features.forEach(f => {
-    f.stories = all(
-      `SELECT * FROM user_stories WHERE feature_id = ? ORDER BY created_at ASC`,
-      [f.id]
-    );
-    // Auto-calculate progress from stories
-    if (f.stories.length > 0) {
-      const done = f.stories.filter(s => s.status === 'Complete' || s.status === 'Closed').length;
-      f.progress = Math.round((done / f.stories.length) * 100);
-    }
+  // Calculate progress per epic from its features' stories
+  epics.forEach(e => {
+    const features = all('SELECT id FROM features WHERE epic_id = ?', [e.id]);
+    let totalStories = 0, doneStories = 0;
+    features.forEach(f => {
+      const stories = all('SELECT status FROM user_stories WHERE feature_id = ?', [f.id]);
+      totalStories += stories.length;
+      doneStories += stories.filter(s => s.status === 'Complete' || s.status === 'Closed').length;
+    });
+    e.progress = totalStories > 0 ? Math.round((doneStories / totalStories) * 100) : 0;
+    e.feature_count = features.length;
   });
 
-  res.render('projects/view', { project, features });
+  res.render('projects/view', { project, epics });
 };
 
 // GET /projects/:id/edit
@@ -77,10 +77,14 @@ exports.update = (req, res) => {
 
 // POST /projects/:id/delete
 exports.delete = (req, res) => {
-  // Delete all user stories under all features of this project
-  const features = all('SELECT id FROM features WHERE project_id = ?', [req.params.id]);
-  features.forEach(f => run('DELETE FROM user_stories WHERE feature_id = ?', [f.id]));
-  run('DELETE FROM features WHERE project_id = ?', [req.params.id]);
+  // Delete all stories under all features under all epics of this project
+  const epics = all('SELECT id FROM epics WHERE project_id = ?', [req.params.id]);
+  epics.forEach(e => {
+    const features = all('SELECT id FROM features WHERE epic_id = ?', [e.id]);
+    features.forEach(f => run('DELETE FROM user_stories WHERE feature_id = ?', [f.id]));
+    run('DELETE FROM features WHERE epic_id = ?', [e.id]);
+  });
+  run('DELETE FROM epics WHERE project_id = ?', [req.params.id]);
   run('DELETE FROM projects WHERE id = ?', [req.params.id]);
   res.redirect('/projects');
 };

@@ -79,15 +79,27 @@ async function getDb() {
 
   // Features & user stories tables for projects
   _db.run(`
-    CREATE TABLE IF NOT EXISTS features (
+    CREATE TABLE IF NOT EXISTS epics (
       id          INTEGER PRIMARY KEY AUTOINCREMENT,
       project_id  INTEGER NOT NULL,
       name        TEXT NOT NULL,
       start_date  TEXT,
       end_date    TEXT,
-      progress    INTEGER NOT NULL DEFAULT 0,
       created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS features (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id  INTEGER NOT NULL,
+      epic_id     INTEGER,
+      name        TEXT NOT NULL,
+      start_date  TEXT,
+      end_date    TEXT,
+      progress    INTEGER NOT NULL DEFAULT 0,
+      created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+      FOREIGN KEY (epic_id) REFERENCES epics(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS user_stories (
@@ -99,6 +111,9 @@ async function getDb() {
       FOREIGN KEY (feature_id) REFERENCES features(id) ON DELETE CASCADE
     );
   `);
+
+  // Migration: add epic_id column to features if missing
+  try { _db.run(`ALTER TABLE features ADD COLUMN epic_id INTEGER REFERENCES epics(id)`); } catch(e) {}
 
   persist();
   return _db;

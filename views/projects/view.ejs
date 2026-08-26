@@ -2,13 +2,13 @@
 <%- include('../layout/header') %>
 
 <%
-// Calculate timeline range from features
+// Calculate timeline range from epics
 let minDate = null, maxDate = null;
-features.forEach(f => {
-  if (f.start_date && (!minDate || f.start_date < minDate)) minDate = f.start_date;
-  if (f.end_date   && (!maxDate || f.end_date   > maxDate)) maxDate = f.end_date;
+epics.forEach(e => {
+  if (e.start_date && (!minDate || e.start_date < minDate)) minDate = e.start_date;
+  if (e.end_date   && (!maxDate || e.end_date   > maxDate)) maxDate = e.end_date;
 });
-// Default to current month + 3 months if no features
+// Default to current month + 3 months if no epics
 if (!minDate) minDate = new Date().toISOString().slice(0,10);
 if (!maxDate) {
   const d = new Date(); d.setMonth(d.getMonth() + 3);
@@ -35,7 +35,7 @@ while (my < endYear || (my === endYear && mm <= endMon)) {
   if (mm > 11) { mm = 0; my++; }
 }
 
-// Range in days — from first day of first month to first day of month AFTER last month
+// Range in days
 const rangeStartDays = toDays(startYear + '-' + String(startMon+1).padStart(2,'0') + '-01');
 const afterEndMon    = endMon + 1 > 11 ? 0 : endMon + 1;
 const afterEndYear   = endMon + 1 > 11 ? endYear + 1 : endYear;
@@ -60,10 +60,10 @@ const totalPx        = months.length * 500;
       </div>
     </div>
     <div class="doc-view-actions">
-      <a href="/projects/<%= project.id %>/features/new" class="btn">+ Add Feature</a>
+      <a href="/projects/<%= project.id %>/epics/new" class="btn">+ Add Epic</a>
       <a href="/projects/<%= project.id %>/edit" class="btn">Edit</a>
       <form method="POST" action="/projects/<%= project.id %>/delete"
-            onsubmit="return confirm('Delete this project and all its features?')" style="display:inline;">
+            onsubmit="return confirm('Delete this project and all its epics?')" style="display:inline;">
         <button type="submit" class="btn btn-danger">Delete</button>
       </form>
     </div>
@@ -76,11 +76,11 @@ const totalPx        = months.length * 500;
     <% } %>
   </div>
 
-  <!-- ── Gantt Chart ── -->
-  <% if (features.length === 0) { %>
+  <!-- ── Gantt Chart — Epics ── -->
+  <% if (epics.length === 0) { %>
     <div class="empty-state-box" style="margin-top:1rem;">
-      <p>No features added yet. Add your first feature to see the timeline.</p>
-      <a href="/projects/<%= project.id %>/features/new" class="btn" style="margin-top:1rem;">+ Add Feature</a>
+      <p>No epics added yet. Add your first epic to see the timeline.</p>
+      <a href="/projects/<%= project.id %>/epics/new" class="btn" style="margin-top:1rem;">+ Add Epic</a>
     </div>
   <% } else { %>
 
@@ -94,24 +94,23 @@ const totalPx        = months.length * 500;
         <% }) %>
       </div>
 
-      <!-- Feature bars -->
+      <!-- Epic bars -->
       <div class="gantt-body" style="width:<%= totalPx %>px; position:relative;">
         <!-- Grid lines -->
         <% months.forEach((m, i) => { %>
           <div class="gantt-grid-line" style="left:<%= i * 500 %>px;"></div>
         <% }) %>
 
-        <% features.forEach(f => {
-          // Calculate bar position using day counts (no timezone issues)
-          const fStartDays = Math.max(toDays(f.start_date), rangeStartDays);
-          const fEndDays   = Math.min(toDays(f.end_date), rangeEndDays);
-          const leftPx  = ((fStartDays - rangeStartDays) / totalDays) * totalPx;
-          const widthPx = ((fEndDays - fStartDays) / totalDays) * totalPx;
+        <% epics.forEach(e => {
+          const eStartDays = Math.max(toDays(e.start_date), rangeStartDays);
+          const eEndDays   = Math.min(toDays(e.end_date), rangeEndDays);
+          const leftPx  = ((eStartDays - rangeStartDays) / totalDays) * totalPx;
+          const widthPx = ((eEndDays - eStartDays) / totalDays) * totalPx;
         %>
         <div class="gantt-row">
-          <a href="/projects/<%= project.id %>/features/<%= f.id %>" class="gantt-bar" style="left:<%= leftPx %>px; width:<%= Math.max(widthPx, 60) %>px;" title="<%= f.name %> (<%= f.progress %>%)">
-            <div class="gantt-bar-fill" style="width:<%= f.progress %>%;"></div>
-            <span class="gantt-bar-label"><%= f.name %></span>
+          <a href="/projects/<%= project.id %>/epics/<%= e.id %>" class="gantt-bar" style="left:<%= leftPx %>px; width:<%= Math.max(widthPx, 80) %>px;" title="<%= e.name %> (<%= e.progress %>% · <%= e.feature_count %> features)">
+            <div class="gantt-bar-fill" style="width:<%= e.progress %>%;"></div>
+            <span class="gantt-bar-label"><%= e.name %></span>
           </a>
         </div>
         <% }) %>
@@ -124,7 +123,7 @@ const totalPx        = months.length * 500;
   <div class="gantt-legend">
     <span><span class="gantt-legend-filled"></span> Completed</span>
     <span><span class="gantt-legend-remaining"></span> Remaining</span>
-    <span style="color:#9ca3af;font-size:0.75rem;">Click a bar to view user stories</span>
+    <span style="color:#9ca3af;font-size:0.75rem;">Click an epic to view its features</span>
   </div>
 
   <% } %>
