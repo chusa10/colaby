@@ -43,7 +43,7 @@
       <div class="task-body">
         <a href="/tasks/<%= t.id %>" class="task-title <%= t.completed ? 'task-title--done' : '' %>"><%= t.title %></a>
         <% if (t.description) { %>
-          <p class="task-desc"><%= t.description.length > 100 ? t.description.slice(0,100) + '…' : t.description %></p>
+          <p class="task-desc"><%= t.description ? t.description.replace(/<[^>]*>/g, '').slice(0,100) + (t.description.replace(/<[^>]*>/g, '').length > 100 ? '…' : '') : '' %></p>
         <% } %>
         <div class="task-meta">
           <% if (t.deadline) { %>
