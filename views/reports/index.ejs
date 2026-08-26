@@ -23,7 +23,7 @@
           <span class="meeting-card-date"><%= r.week_of %></span>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.35rem;">
-          <p class="meeting-card-preview"><%= r.content %></p>
+          <p class="meeting-card-preview"><%= r.content ? r.content.replace(/<[^>]*>/g, '').slice(0, 150) : '' %></p>
           <span style="margin-left:0.75rem; flex-shrink:0;"><%- include('../layout/author-badge', { author: r.author }) %></span>
         </div>
       </a>

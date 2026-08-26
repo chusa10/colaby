@@ -21,7 +21,7 @@
           <span class="meeting-card-date"><%= m.date %></span>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.35rem;">
-          <p class="meeting-card-preview"><%= m.summary ? m.summary : 'No summary provided.' %></p>
+          <p class="meeting-card-preview"><%= m.summary ? m.summary.replace(/<[^>]*>/g, '').slice(0, 150) : 'No summary provided.' %></p>
           <span style="margin-left:0.75rem; flex-shrink:0;"><%- include('../layout/author-badge', { author: m.author }) %></span>
         </div>
       </a>
