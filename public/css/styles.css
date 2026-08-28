@@ -896,23 +896,25 @@ a { color: #6366f1; }
   margin: 4px 0;
 }
 
+/* Epic bar rendered as an ORANGE chevron (Azure DevOps epic color) */
 .gantt-bar {
   position: absolute;
-  top: 4px;
-  height: 34px;
-  background: #e0e7ff;
-  border-radius: 6px;
+  top: 3px;
+  height: 36px;
+  background: #ff7b00;
   overflow: hidden;
   display: flex;
   align-items: center;
   text-decoration: none;
   cursor: pointer;
-  border: 1px solid #a5b4fc;
-  transition: box-shadow 0.15s;
-  min-width: 60px;
+  transition: filter 0.15s, box-shadow 0.15s;
+  min-width: 80px;
+  /* Chevron / arrow shape */
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
 }
 .gantt-bar:hover {
-  box-shadow: 0 3px 12px rgba(99,102,241,.25);
+  filter: brightness(1.08);
+  box-shadow: 0 3px 12px rgba(255,123,0,.35);
 }
 
 .gantt-bar-fill {
@@ -920,19 +922,18 @@ a { color: #6366f1; }
   left: 0;
   top: 0;
   bottom: 0;
-  background: #6366f1;
-  border-radius: 6px 0 0 6px;
-  opacity: 0.85;
+  background: #c95f00;
+  opacity: 0.55;
   transition: width 0.3s;
 }
 
 .gantt-bar-label {
   position: relative;
   z-index: 1;
-  padding: 0 0.75rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #1e1b4b;
+  padding: 0 0.75rem 0 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -950,7 +951,7 @@ a { color: #6366f1; }
   display: inline-block;
   width: 14px;
   height: 10px;
-  background: #6366f1;
+  background: #c95f00;
   border-radius: 3px;
   margin-right: 4px;
   vertical-align: middle;
@@ -959,7 +960,7 @@ a { color: #6366f1; }
   display: inline-block;
   width: 14px;
   height: 10px;
-  background: #e0e7ff;
+  background: #ff7b00;
   border-radius: 3px;
   margin-right: 4px;
   vertical-align: middle;
@@ -978,7 +979,7 @@ a { color: #6366f1; }
 }
 .feature-progress-fill {
   height: 100%;
-  background: #6366f1;
+  background: #773b93;
   border-radius: 999px;
   transition: width 0.3s;
 }
@@ -1017,6 +1018,7 @@ a { color: #6366f1; }
   padding: 0.7rem 1rem;
   box-shadow: 0 1px 3px rgba(0,0,0,.05);
   border: 1px solid #d1d5db;
+  border-left: 4px solid #009ccc;
 }
 .story-item-body { flex: 1; min-width: 0; }
 .story-title {
@@ -1135,6 +1137,7 @@ a { color: #6366f1; }
   padding: 0.85rem 1.1rem;
   box-shadow: 0 1px 3px rgba(0,0,0,.06);
   border: 1px solid #d1d5db;
+  border-left: 4px solid #773b93;
   transition: box-shadow 0.15s;
 }
 .feature-item:hover { box-shadow: 0 3px 10px rgba(0,0,0,.09); }
@@ -1165,7 +1168,7 @@ a { color: #6366f1; }
 }
 .feature-mini-progress-fill {
   height: 100%;
-  background: #6366f1;
+  background: #773b93;
   border-radius: 999px;
   transition: width 0.3s;
 }
