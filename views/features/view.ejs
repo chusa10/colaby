@@ -60,31 +60,69 @@
     <p class="empty-state" style="margin-top:1rem;">No user stories yet. Add one above.</p>
   <% } else { %>
     <ul class="story-list">
-      <% stories.forEach(s => { %>
-      <li class="story-item">
-        <div class="story-item-body">
-          <span class="story-title <%= (s.status==='Resolved'||s.status==='Closed') ? 'story-title--done' : '' %>" id="story-label-<%= s.id %>"><%= s.title %></span>
-          <!-- Inline edit form (hidden by default) -->
-          <form method="POST" action="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= feature.id %>/stories/<%= s.id %>/edit"
-                class="story-edit-form" id="story-edit-<%= s.id %>" style="display:none;">
-            <input type="text" name="title" value="<%= s.title %>" required />
-            <button type="submit" class="btn btn-sm">Save</button>
-            <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" style="background:#9ca3af;">Cancel</button>
-          </form>
+      <% stories.forEach(s => {
+        const base = '/projects/'+project.id+'/epics/'+epic.id+'/features/'+feature.id+'/stories/'+s.id;
+      %>
+      <li class="story-block">
+        <div class="story-item">
+          <div class="story-item-body">
+            <span class="story-title <%= (s.status==='Resolved'||s.status==='Closed') ? 'story-title--done' : '' %>" id="story-label-<%= s.id %>"><%= s.title %></span>
+            <form method="POST" action="<%= base %>/edit"
+                  class="story-edit-form" id="story-edit-<%= s.id %>" style="display:none;">
+              <input type="text" name="title" value="<%= s.title %>" required />
+              <button type="submit" class="btn btn-sm">Save</button>
+              <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" style="background:#9ca3af;">Cancel</button>
+            </form>
+          </div>
+          <div class="story-item-actions">
+            <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" title="Edit story" style="background:#f59e0b;">✎</button>
+            <form method="POST" action="<%= base %>/status" class="story-status-form">
+              <select name="status" onchange="this.form.submit()">
+                <% ['New','Active','Resolved','Closed','Removed','Inactive'].forEach(st => { %>
+                  <option value="<%= st %>" <%= s.status === st ? 'selected' : '' %>><%= st %></option>
+                <% }) %>
+              </select>
+            </form>
+            <form method="POST" action="<%= base %>/delete"
+                  onsubmit="return confirm('Delete this story?')" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">✕</button>
+            </form>
+          </div>
         </div>
-        <div class="story-item-actions">
-          <!-- Edit button -->
-          <button type="button" class="btn btn-sm" onclick="toggleStoryEdit(<%= s.id %>)" title="Edit story" style="background:#f59e0b;">✎</button>
-          <form method="POST" action="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= feature.id %>/stories/<%= s.id %>/status" class="story-status-form">
-            <select name="status" onchange="this.form.submit()">
-              <% ['New','Active','Resolved','Closed','Removed','Inactive'].forEach(st => { %>
-                <option value="<%= st %>" <%= s.status === st ? 'selected' : '' %>><%= st %></option>
-              <% }) %>
+
+        <!-- Tasks nested under this story -->
+        <div class="task-nest">
+          <% (s.tasks || []).forEach(t => { %>
+          <div class="story-task-item">
+            <span class="story-task-title <%= (t.status==='Resolved'||t.status==='Closed') ? 'story-title--done' : '' %>"><%= t.title %></span>
+            <div class="story-item-actions">
+              <form method="POST" action="<%= base %>/tasks/<%= t.id %>/status" class="story-status-form">
+                <select name="status" onchange="this.form.submit()">
+                  <% ['New','Active','Resolved','Closed','Removed','Inactive'].forEach(st => { %>
+                    <option value="<%= st %>" <%= t.status === st ? 'selected' : '' %>><%= st %></option>
+                  <% }) %>
+                </select>
+              </form>
+              <form method="POST" action="<%= base %>/tasks/<%= t.id %>/delete"
+                    onsubmit="return confirm('Delete this task?')" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm">✕</button>
+              </form>
+            </div>
+          </div>
+          <% }) %>
+
+          <!-- Add task form -->
+          <form method="POST" action="<%= base %>/tasks" class="story-task-add-form">
+            <input type="text" name="title" placeholder="+ Add a task…" required />
+            <select name="status">
+              <option value="New">New</option>
+              <option value="Active">Active</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+              <option value="Removed">Removed</option>
+              <option value="Inactive">Inactive</option>
             </select>
-          </form>
-          <form method="POST" action="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= feature.id %>/stories/<%= s.id %>/delete"
-                onsubmit="return confirm('Delete this story?')" style="display:inline;">
-            <button type="submit" class="btn btn-danger btn-sm">✕</button>
+            <button type="submit" class="btn btn-sm">Add Task</button>
           </form>
         </div>
       </li>

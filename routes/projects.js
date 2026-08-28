@@ -5,6 +5,7 @@ const projectsCtrl = require('../controllers/projectsController');
 const epicsCtrl    = require('../controllers/epicsController');
 const featuresCtrl = require('../controllers/featuresController');
 const storiesCtrl  = require('../controllers/storiesController');
+const storyTasksCtrl = require('../controllers/storyTasksController');
 
 // Projects CRUD
 router.get('/',                 requireAuth, projectsCtrl.index);
@@ -36,5 +37,11 @@ router.post('/:projectId/epics/:epicId/features/:featureId/stories',            
 router.post('/:projectId/epics/:epicId/features/:featureId/stories/:id/edit',       requireAuth, storiesCtrl.update);
 router.post('/:projectId/epics/:epicId/features/:featureId/stories/:id/status',     requireAuth, storiesCtrl.updateStatus);
 router.post('/:projectId/epics/:epicId/features/:featureId/stories/:id/delete',     requireAuth, storiesCtrl.delete);
+
+// Story tasks (nested under user story)
+router.post('/:projectId/epics/:epicId/features/:featureId/stories/:storyId/tasks',                requireAuth, storyTasksCtrl.create);
+router.post('/:projectId/epics/:epicId/features/:featureId/stories/:storyId/tasks/:id/edit',       requireAuth, storyTasksCtrl.update);
+router.post('/:projectId/epics/:epicId/features/:featureId/stories/:storyId/tasks/:id/status',     requireAuth, storyTasksCtrl.updateStatus);
+router.post('/:projectId/epics/:epicId/features/:featureId/stories/:storyId/tasks/:id/delete',     requireAuth, storyTasksCtrl.delete);
 
 module.exports = router;

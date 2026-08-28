@@ -115,6 +115,18 @@ async function getDb() {
   // Migration: add epic_id column to features if missing
   try { _db.run(`ALTER TABLE features ADD COLUMN epic_id INTEGER REFERENCES epics(id)`); } catch(e) {}
 
+  // Story tasks — tasks nested under user stories
+  _db.run(`
+    CREATE TABLE IF NOT EXISTS story_tasks (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      story_id    INTEGER NOT NULL,
+      title       TEXT NOT NULL,
+      status      TEXT NOT NULL DEFAULT 'New',
+      created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (story_id) REFERENCES user_stories(id) ON DELETE CASCADE
+    );
+  `);
+
   persist();
   return _db;
 }

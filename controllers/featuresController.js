@@ -38,6 +38,11 @@ exports.view = (req, res) => {
     [feature.id]
   );
 
+  // Load tasks for each story
+  stories.forEach(s => {
+    s.tasks = all('SELECT * FROM story_tasks WHERE story_id = ? ORDER BY created_at ASC', [s.id]);
+  });
+
   // Calculate progress
   let progress = 0;
   if (stories.length > 0) {
