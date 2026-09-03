@@ -32,48 +32,77 @@
     </span>
     <span class="badge"><%= epicProgress %>% complete</span>
     <span style="font-size:0.78rem;color:#9ca3af;"><%= features.length %> feature<%= features.length !== 1 ? 's' : '' %></span>
+    <% if (epic.ado_url) { %>
+      <a href="<%= epic.ado_url %>" target="_blank" rel="noopener" class="ado-link">View Epic in ADO ↗</a>
+    <% } %>
   </div>
 
-  <!-- Progress bar -->
   <div class="feature-progress-bar">
     <div class="feature-progress-fill" style="width:<%= epicProgress %>%;"></div>
   </div>
 
-  <!-- Features list -->
+  <!-- Features -->
   <% if (features.length === 0) { %>
     <div class="empty-state-box" style="margin-top:1rem;">
-      <p>No features added to this epic yet.</p>
+      <p>No features yet.</p>
       <a href="/projects/<%= project.id %>/epics/<%= epic.id %>/features/new" class="btn" style="margin-top:1rem;">+ Add Feature</a>
     </div>
   <% } else { %>
 
     <h3 style="margin-bottom:0.75rem; font-size:1rem; font-weight:700;">Features</h3>
 
-    <ul class="feature-list">
-      <% features.forEach(f => { %>
-      <li class="feature-item">
-        <a href="/projects/<%= project.id %>/epics/<%= epic.id %>/features/<%= f.id %>" class="feature-item-body">
-          <span class="feature-item-name"><%= f.name %></span>
-          <span class="feature-item-meta">
-            <% if (f.start_date && f.end_date) { %>
-              <%= f.start_date %> → <%= f.end_date %>
-            <% } %>
-            · <%= f.stories.length %> stor<%= f.stories.length !== 1 ? 'ies' : 'y' %>
-          </span>
-        </a>
-        <div class="feature-item-right">
-          <div class="feature-mini-progress">
-            <div class="feature-mini-progress-fill" style="width:<%= f.progress %>%;"></div>
+    <div class="feature-cards">
+      <% features.forEach(f => {
+        const base = '/projects/'+project.id+'/epics/'+epic.id+'/features/'+f.id;
+      %>
+      <div class="feature-card">
+        <div class="feature-card-top">
+          <span class="feature-card-name"><%= f.name %></span>
+          <div class="feature-card-actions">
+            <form method="POST" action="<%= base %>/status" class="story-status-form">
+              <select name="status" onchange="this.form.submit()">
+                <% ['New','Active','Resolved','Closed','Removed','Inactive'].forEach(st => { %>
+                  <option value="<%= st %>" <%= f.status === st ? 'selected' : '' %>><%= st %></option>
+                <% }) %>
+              </select>
+            </form>
+            <a href="<%= base %>/edit" class="btn btn-sm">Edit</a>
+            <form method="POST" action="<%= base %>/delete" onsubmit="return confirm('Delete this feature?')" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">✕</button>
+            </form>
           </div>
-          <span class="feature-item-pct"><%= f.progress %>%</span>
         </div>
-      </li>
+
+        <div class="feature-card-links">
+          <span class="badge badge-<%= f.status.toLowerCase().replace(/ /g,'-') %>"><%= f.status %></span>
+          <% if (f.ado_url) { %>
+            <a href="<%= f.ado_url %>" target="_blank" rel="noopener" class="ado-link">View in ADO ↗</a>
+          <% } %>
+        </div>
+
+        <% if (f.this_week || f.next_week) { %>
+        <div class="feature-weekly">
+          <% if (f.this_week) { %>
+          <div class="weekly-block">
+            <span class="weekly-label">This week</span>
+            <p><%= f.this_week %></p>
+          </div>
+          <% } %>
+          <% if (f.next_week) { %>
+          <div class="weekly-block">
+            <span class="weekly-label">Next week</span>
+            <p><%= f.next_week %></p>
+          </div>
+          <% } %>
+        </div>
+        <% } %>
+      </div>
       <% }) %>
-    </ul>
+    </div>
 
   <% } %>
 
-  <a href="/projects/<%= project.id %>" class="doc-back-link">&larr; Back to Project Timeline</a>
+  <a href="/projects/<%= project.id %>" class="doc-back-link">&larr; Back to Roadmap</a>
 
 </div>
 

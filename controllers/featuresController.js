@@ -1,5 +1,14 @@
 const { all, get, run } = require('../config/db');
 
+const STATUSES = ['New', 'Active', 'Resolved', 'Closed', 'Removed', 'Inactive'];
+
+// Feature completion contribution: Closed/Resolved = 100, Active = 50, else 0
+function featurePct(status) {
+  if (status === 'Closed' || status === 'Resolved') return 100;
+  if (status === 'Active') return 50;
+  return 0;
+}
+
 // GET /projects/:projectId/epics/:epicId/features/new
 exports.newForm = (req, res) => {
   const project = get('SELECT * FROM projects WHERE id = ?', [req.params.projectId]);
@@ -10,7 +19,7 @@ exports.newForm = (req, res) => {
 
 // POST /projects/:projectId/epics/:epicId/features
 exports.create = (req, res) => {
-  const { name, start_date, end_date } = req.body;
+  const { name, status, ado_url, this_week, next_week } = req.body;
   const { projectId, epicId } = req.params;
 
   if (!name) {
@@ -20,38 +29,17 @@ exports.create = (req, res) => {
   }
 
   run(
-    `INSERT INTO features (project_id, epic_id, name, start_date, end_date) VALUES (?, ?, ?, ?, ?)`,
-    [projectId, epicId, name.trim(), start_date || null, end_date || null]
+    `INSERT INTO features (project_id, epic_id, name, status, ado_url, this_week, next_week)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [
+      projectId, epicId, name.trim(),
+      STATUSES.includes(status) ? status : 'New',
+      (ado_url || '').trim(),
+      (this_week || '').trim(),
+      (next_week || '').trim(),
+    ]
   );
   res.redirect(`/projects/${projectId}/epics/${epicId}`);
-};
-
-// GET /projects/:projectId/epics/:epicId/features/:id — show stories
-exports.view = (req, res) => {
-  const feature = get('SELECT * FROM features WHERE id = ?', [req.params.id]);
-  if (!feature) return res.status(404).send('Feature not found.');
-
-  const project = get('SELECT * FROM projects WHERE id = ?', [req.params.projectId]);
-  const epic = get('SELECT * FROM epics WHERE id = ?', [req.params.epicId]);
-  const stories = all(
-    `SELECT * FROM user_stories WHERE feature_id = ? ORDER BY created_at ASC`,
-    [feature.id]
-  );
-
-  // Load tasks for each story
-  stories.forEach(s => {
-    s.tasks = all('SELECT * FROM story_tasks WHERE story_id = ? ORDER BY created_at ASC', [s.id]);
-  });
-
-  // Calculate progress
-  let progress = 0;
-  if (stories.length > 0) {
-    const done = stories.filter(s => s.status === 'Resolved' || s.status === 'Closed').length;
-    progress = Math.round((done / stories.length) * 100);
-  }
-  feature.progress = progress;
-
-  res.render('features/view', { project, epic, feature, stories });
 };
 
 // GET /projects/:projectId/epics/:epicId/features/:id/edit
@@ -65,7 +53,7 @@ exports.editForm = (req, res) => {
 
 // POST /projects/:projectId/epics/:epicId/features/:id
 exports.update = (req, res) => {
-  const { name, start_date, end_date } = req.body;
+  const { name, status, ado_url, this_week, next_week } = req.body;
   const { projectId, epicId, id } = req.params;
 
   if (!name) {
@@ -75,9 +63,26 @@ exports.update = (req, res) => {
     return res.render('features/form', { project, epic, feature, error: 'Feature name is required.' });
   }
   run(
-    `UPDATE features SET name=?, start_date=?, end_date=? WHERE id=?`,
-    [name.trim(), start_date || null, end_date || null, id]
+    `UPDATE features SET name=?, status=?, ado_url=?, this_week=?, next_week=? WHERE id=?`,
+    [
+      name.trim(),
+      STATUSES.includes(status) ? status : 'New',
+      (ado_url || '').trim(),
+      (this_week || '').trim(),
+      (next_week || '').trim(),
+      id,
+    ]
   );
+  res.redirect(`/projects/${projectId}/epics/${epicId}`);
+};
+
+// POST /projects/:projectId/epics/:epicId/features/:id/status  (quick status change)
+exports.updateStatus = (req, res) => {
+  const { status } = req.body;
+  const { projectId, epicId, id } = req.params;
+  if (STATUSES.includes(status)) {
+    run('UPDATE features SET status = ? WHERE id = ?', [status, id]);
+  }
   res.redirect(`/projects/${projectId}/epics/${epicId}`);
 };
 
@@ -88,3 +93,6 @@ exports.delete = (req, res) => {
   run('DELETE FROM features WHERE id = ?', [id]);
   res.redirect(`/projects/${projectId}/epics/${epicId}`);
 };
+
+module.exports.STATUSES = STATUSES;
+module.exports.featurePct = featurePct;

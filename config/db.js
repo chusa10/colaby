@@ -115,6 +115,13 @@ async function getDb() {
   // Migration: add epic_id column to features if missing
   try { _db.run(`ALTER TABLE features ADD COLUMN epic_id INTEGER REFERENCES epics(id)`); } catch(e) {}
 
+  // Hybrid roadmap migrations
+  try { _db.run(`ALTER TABLE epics ADD COLUMN ado_url TEXT`); } catch(e) {}
+  try { _db.run(`ALTER TABLE features ADD COLUMN ado_url TEXT`); } catch(e) {}
+  try { _db.run(`ALTER TABLE features ADD COLUMN this_week TEXT`); } catch(e) {}
+  try { _db.run(`ALTER TABLE features ADD COLUMN next_week TEXT`); } catch(e) {}
+  try { _db.run(`ALTER TABLE features ADD COLUMN status TEXT DEFAULT 'New'`); } catch(e) {}
+
   // Story tasks — tasks nested under user stories
   _db.run(`
     CREATE TABLE IF NOT EXISTS story_tasks (

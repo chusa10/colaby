@@ -14,13 +14,23 @@
          value="<%= feature ? feature.name : '' %>" required autofocus
          placeholder='e.g. "Login with SSO"' />
 
-  <label for="start_date">Start Date <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
-  <input type="date" id="start_date" name="start_date"
-         value="<%= feature ? (feature.start_date||'') : '' %>" />
+  <label for="status">Status</label>
+  <select id="status" name="status">
+    <% ['New','Active','Resolved','Closed','Removed','Inactive'].forEach(s => { %>
+      <option value="<%= s %>" <%= feature && feature.status === s ? 'selected' : '' %>><%= s %></option>
+    <% }) %>
+  </select>
 
-  <label for="end_date">End Date <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
-  <input type="date" id="end_date" name="end_date"
-         value="<%= feature ? (feature.end_date||'') : '' %>" />
+  <label for="ado_url">Azure DevOps Link <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+  <input type="url" id="ado_url" name="ado_url"
+         value="<%= feature ? (feature.ado_url||'') : '' %>"
+         placeholder="https://dev.azure.com/org/project/_workitems/edit/12345" />
+
+  <label for="this_week">This Week <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+  <textarea id="this_week" name="this_week" rows="2" placeholder="What happened this week…"><%= feature ? (feature.this_week||'') : '' %></textarea>
+
+  <label for="next_week">Next Week <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+  <textarea id="next_week" name="next_week" rows="2" placeholder="What's planned next week…"><%= feature ? (feature.next_week||'') : '' %></textarea>
 
   <div style="margin-top:1.5rem;">
     <button type="submit">Save</button>

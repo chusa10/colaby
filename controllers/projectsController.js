@@ -1,4 +1,5 @@
 const { all, get, run } = require('../config/db');
+const { featurePct } = require('./featuresController');
 
 // GET /projects
 exports.index = (req, res) => {
@@ -28,7 +29,26 @@ exports.create = (req, res) => {
   res.redirect(`/projects/${lastInsertRowid}`);
 };
 
-// GET /projects/:id — Gantt chart view showing Epics
+// Derive epic status from % and dates
+function epicStatus(epic, pct) {
+  if (pct >= 100) return 'Done';
+  const today = new Date().toISOString().slice(0, 10);
+  if (epic.end_date && epic.end_date < today && pct < 100) return 'At Risk';
+  // Past the halfway point but under 50% → At Risk
+  if (epic.start_date && epic.end_date) {
+    const start = new Date(epic.start_date).getTime();
+    const end   = new Date(epic.end_date).getTime();
+    const now   = Date.now();
+    if (now > start && end > start) {
+      const timeElapsed = (now - start) / (end - start);
+      if (timeElapsed > 0.5 && pct < timeElapsed * 100 - 15) return 'At Risk';
+    }
+  }
+  if (pct > 0) return 'On Track';
+  return 'Not Started';
+}
+
+// GET /projects/:id — dashboard + epic timeline
 exports.view = (req, res) => {
   const project = get('SELECT * FROM projects WHERE id = ?', [req.params.id]);
   if (!project) return res.status(404).send('Project not found.');
@@ -38,20 +58,37 @@ exports.view = (req, res) => {
     [project.id]
   );
 
-  // Calculate progress per epic from its features' stories
+  // Feature status tally for the dashboard
+  const statusTally = {};
+  let totalFeatures = 0;
+
   epics.forEach(e => {
-    const features = all('SELECT id FROM features WHERE epic_id = ?', [e.id]);
-    let totalStories = 0, doneStories = 0;
-    features.forEach(f => {
-      const stories = all('SELECT status FROM user_stories WHERE feature_id = ?', [f.id]);
-      totalStories += stories.length;
-      doneStories += stories.filter(s => s.status === 'Resolved' || s.status === 'Closed').length;
-    });
-    e.progress = totalStories > 0 ? Math.round((doneStories / totalStories) * 100) : 0;
+    const features = all('SELECT status FROM features WHERE epic_id = ?', [e.id]);
     e.feature_count = features.length;
+    e.progress = features.length > 0
+      ? Math.round(features.reduce((sum, f) => sum + featurePct(f.status), 0) / features.length)
+      : 0;
+    e.statusLabel = epicStatus(e, e.progress);
+
+    features.forEach(f => {
+      statusTally[f.status] = (statusTally[f.status] || 0) + 1;
+      totalFeatures++;
+    });
   });
 
-  res.render('projects/view', { project, epics });
+  // Dashboard summary
+  const summary = {
+    epicCount: epics.length,
+    avgProgress: epics.length > 0
+      ? Math.round(epics.reduce((s, e) => s + e.progress, 0) / epics.length)
+      : 0,
+    atRisk: epics.filter(e => e.statusLabel === 'At Risk').length,
+    done: epics.filter(e => e.statusLabel === 'Done').length,
+    totalFeatures,
+    statusTally,
+  };
+
+  res.render('projects/view', { project, epics, summary });
 };
 
 // GET /projects/:id/edit
@@ -77,7 +114,6 @@ exports.update = (req, res) => {
 
 // POST /projects/:id/delete
 exports.delete = (req, res) => {
-  // Delete all stories under all features under all epics of this project
   const epics = all('SELECT id FROM epics WHERE project_id = ?', [req.params.id]);
   epics.forEach(e => {
     const features = all('SELECT id FROM features WHERE epic_id = ?', [e.id]);

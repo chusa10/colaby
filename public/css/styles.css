@@ -1245,3 +1245,115 @@ a { color: #6366f1; }
 }
 .story-task-add-form .btn { margin: 0; background: #f2cb1d; color: #422006; }
 .story-task-add-form .btn:hover { background: #e0b90a; }
+
+/* ─────────────────────────────────────────────
+   Roadmap dashboard strip
+───────────────────────────────────────────── */
+.dash-strip {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.25rem 0 1rem;
+}
+.dash-card {
+  flex: 1;
+  min-width: 110px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.dash-num { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; line-height: 1; }
+.dash-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+.dash-card--risk { border-color: #fecaca; background: #fef2f2; }
+.dash-card--risk .dash-num { color: #dc2626; }
+.dash-card--done { border-color: #a7f3d0; background: #f0fdf4; }
+.dash-card--done .dash-num { color: #059669; }
+
+/* Feature status tally */
+.status-tally {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+/* Legend dots */
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* ─────────────────────────────────────────────
+   Feature cards (inside epic view)
+───────────────────────────────────────────── */
+.feature-cards { display: flex; flex-direction: column; gap: 0.75rem; }
+.feature-card {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-left: 4px solid #773b93;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.feature-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.feature-card-name { font-weight: 700; font-size: 0.95rem; color: #1a1a2e; }
+.feature-card-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.feature-card-actions select {
+  width: auto; font-size: 0.75rem; padding: 0.25rem 0.5rem; margin: 0;
+  border-radius: 6px; border: 1px solid #e5e7eb; background: #f9fafb;
+}
+.feature-card-actions .btn { margin: 0; }
+
+.feature-card-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+/* ADO link style */
+.ado-link {
+  font-size: 0.78rem;
+  color: #0078d4;
+  text-decoration: none;
+  font-weight: 600;
+}
+.ado-link:hover { text-decoration: underline; }
+
+/* Weekly notes */
+.feature-weekly {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed #e5e7eb;
+  flex-wrap: wrap;
+}
+.weekly-block { flex: 1; min-width: 200px; }
+.weekly-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+.weekly-block p {
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.5;
+  margin-top: 0.2rem;
+}
